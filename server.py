@@ -1,8 +1,37 @@
-from flask import Flask
+import os
+from flask import Flask, request
+from urllib.parse import urlencode
+from dotenv import load_dotenv
 
-app = Flask(__name__)
+load_dotenv()
+
+RC_AUTH_URL = "https://www.recurse.com/oauth/authorize"
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+REDIRECT_URI = os.getenv("REDIRECT_URI")
+
+app = Flask(__name__, static_folder="static", static_url_path="")
 
 @app.route("/")
+def index_route():
+    return app.send_static_file("index.html")
+
+@app.route("/login")
+def login():
+    return app.redirect(f"{RC_AUTH_URL}?{urlencode({
+        "response_type": "code",
+        "client_id": CLIENT_ID,
+        "redirect_uri": REDIRECT_URI,
+    })}")
+
+@app.route("/rcredirect")
+def rcredirect():
+    code = request.args.get("code")
+    if code is not None:
+        return f"Code: {code}"
+    return "Invalid redirect"
+
+@app.route("/api")
 def hello_world():
     return "<p>Hello, World</p>"
 
