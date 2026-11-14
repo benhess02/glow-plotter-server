@@ -2,10 +2,12 @@ import os
 from flask import Flask, request
 from urllib.parse import urlencode
 from dotenv import load_dotenv
+import requests
 
 load_dotenv()
 
 RC_AUTH_URL = "https://www.recurse.com/oauth/authorize"
+RC_TOKEN_URL = "https://www.recurse.com/oauth/token"
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 REDIRECT_URI = os.getenv("REDIRECT_URI")
@@ -28,7 +30,14 @@ def login():
 def rcredirect():
     code = request.args.get("code")
     if code is not None:
-        return f"Code: {code}"
+        res = requests.get(RC_TOKEN_URL, params={
+            "grant_type": "authorization_code",
+            "code": code,
+            "redirect_uri": REDIRECT_URI,
+            "client_id": CLIENT_ID,
+            "client_secret": CLIENT_SECRET
+        }).content
+        return res
     return "Invalid redirect"
 
 @app.route("/api")
