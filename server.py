@@ -31,7 +31,7 @@ def rcredirect():
     code = request.args.get("code")
     if code is not None:
         try:
-            res = requests.get(RC_TOKEN_URL, params={
+            res = requests.post(RC_TOKEN_URL, data={
                 "grant_type": "authorization_code",
                 "code": code,
                 "redirect_uri": REDIRECT_URI,
