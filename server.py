@@ -30,14 +30,17 @@ def login():
 def rcredirect():
     code = request.args.get("code")
     if code is not None:
-        res = requests.get(RC_TOKEN_URL, params={
-            "grant_type": "authorization_code",
-            "code": code,
-            "redirect_uri": REDIRECT_URI,
-            "client_id": CLIENT_ID,
-            "client_secret": CLIENT_SECRET
-        }).content
-        return res
+        try:
+            res = requests.get(RC_TOKEN_URL, params={
+                "grant_type": "authorization_code",
+                "code": code,
+                "redirect_uri": REDIRECT_URI,
+                "client_id": CLIENT_ID,
+                "client_secret": CLIENT_SECRET
+            }).content
+            return res.decode()
+        except:
+            return "Failed to get token"
     return "Invalid redirect"
 
 @app.route("/api")
